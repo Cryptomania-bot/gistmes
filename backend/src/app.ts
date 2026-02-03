@@ -3,36 +3,47 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
-import { clerkMiddleware } from '@clerk/express'
+import { clerkMiddleware } from '@clerk/express';
 import { errorHandler } from './errorHandler.js';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
+// 1. Recreate __dirname (Necessary for ES Modules in Node/Bun)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
+
 app.use(express.json());
 app.use(clerkMiddleware());
 
+// Health Check
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is healthy' });
 });
 
+// --- API Routes ---
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/message', messageRoutes);
 
-
+// Error Handler (Keep this AFTER your API routes)
 app.use(errorHandler);
 
+// --- Static File Serving (Production) ---
+if (process.env.NODE_ENV === 'production') {
+    // This points to /app/web/dist based on your Docker structure
+    // We go up two levels: out of src/ and out of backend/
+    const distPath = path.join(__dirname, '../../web/dist');
 
-if(process.env.NODE_ENV === 'production'){
-    app.use(express.static(path.join(__dirname, '../../web/build')))
+    // Serve the static assets (js, css, images)
+    app.use(express.static(distPath));
 
-    app.get('/{*any}', (_, res) => {
-        res.sendFile(path.resolve(__dirname, '../../web/dist/index.html'))
-    })
-
+    // Handle React/Vite routing: serve index.html for any non-API request
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(distPath, 'index.html'));
+    });
 }
 
-
-export default app; 
+export default app;
