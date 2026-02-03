@@ -15,9 +15,8 @@ ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
 # --- STAGE 2: Final Runtime ---
-FROM oven/bun:latest
+FROM oven/bun:1.3.5
 WORKDIR /app
-
 # 1. Bring in the built frontend files from Stage 1
 # This keeps your final image small because it doesn't include npm or Node
 COPY --from=build-web /app/web/dist ./web/dist
