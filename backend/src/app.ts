@@ -41,7 +41,7 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(distPath));
 
     // Handle React/Vite routing: serve index.html for any non-API request
-    app.get('*', (req, res) => {
+    app.get('*any', (req, res) => {
         res.sendFile(path.resolve(distPath, 'index.html'));
     });
 }
