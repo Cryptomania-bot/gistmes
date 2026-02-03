@@ -1,47 +1,38 @@
-# 1. Use the official Bun image
-FROM oven/bun:latest
-
-# 2. Set the working directory
-WORKDIR /app
-
-# --- 3. Build Web Frontend ---
+# --- STAGE 1: Build the Web Frontend ---
+FROM node:18-slim AS build-web
 WORKDIR /app/web
 
-# Copy package files first for better caching
-# We use package-lock.json since you are using npm
+# Copy package files and install using npm
 COPY web/package.json web/package-lock.json* ./
 RUN npm install
 
-# Copy the rest of the frontend source
+# Copy source and build
 COPY web/ ./
-
-# Set Build Arguments for Vite
 ARG VITE_CLERK_PUBLISHABLE_KEY
 ARG VITE_API_URL
 ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
 ENV VITE_API_URL=$VITE_API_URL
-
-# Build the frontend (creates the /dist folder)
 RUN npm run build
 
-# --- 4. Install Backend Dependencies ---
+# --- STAGE 2: Final Runtime ---
+FROM oven/bun:latest
+WORKDIR /app
+
+# 1. Bring in the built frontend files from Stage 1
+# This keeps your final image small because it doesn't include npm or Node
+COPY --from=build-web /app/web/dist ./web/dist
+
+# 2. Setup Backend
 WORKDIR /app/backend
+COPY backend/package.json backend/bun.lockb* ./
+RUN bun install
 
-# Copy backend package files
-COPY backend/package.json backend/package-lock.json* ./
-RUN npm install
-
-# Copy backend source code
 COPY backend/ ./
 
-# --- 5. Final Environment Setup ---
-# Set non-sensitive defaults
+# 3. Environment & Start
 ENV PORT=3000
 ENV NODE_ENV=production
-
-# Expose the port so the outside world can connect
 EXPOSE 3000
 
-# 6. Start the application
-# We use 'bun' here because it runs index.ts natively without a build step
+# Start with bun
 CMD ["bun", "index.ts"]
