@@ -10,6 +10,8 @@ const {width,height}= Dimensions.get('window')
 const AuthScreen = () => {
 
   const {handleSocialAuth, loadingStrategy} = useAuthSocial()
+  const isLoading = loadingStrategy !== null;
+
   return (
     <View className='flex-1 bg-surface-dark '>
      <View className='absolute inset-0 overflow-hidden'></View>
@@ -49,7 +51,7 @@ const AuthScreen = () => {
       <View className='flex-row gap-4 mt-10'>
         {/* {gooogleBtn} */}
 
-        <Pressable className=' flex-1 flex-row items-center justify-center gap-2 bg-white/95 py-4 rounded-2xl active:scale-95'disabled={loadingStrategy === 'oauth_google'} onPress={()=>handleSocialAuth('oauth_google')}> 
+        <Pressable className=' flex-1 flex-row items-center justify-center gap-2 bg-white/95 py-4 rounded-2xl active:scale-97'disabled={isLoading} accessibilityRole='button'accessibilityLabel='Continue with Google' onPress={()=>!isLoading && handleSocialAuth('oauth_google')}> 
         {loadingStrategy === 'oauth_google' ? (<ActivityIndicator size="small" color="#000000" />) : (
           <>
           <Image source={require('../../assets/images/google.png')} style={{width:20, height:20}} contentFit='contain' />
@@ -59,7 +61,7 @@ const AuthScreen = () => {
         </Pressable>
         {/* {AppleBtn} */}
 
-        <Pressable className=' flex-1 flex-row items-center justify-center gap-2 bg-white/10 py-4 rounded-2xl active:scale-95'disabled={loadingStrategy === 'oauth_apple'} onPress={()=>handleSocialAuth('oauth_apple')}> 
+        <Pressable className=' flex-1 flex-row items-center justify-center gap-2 bg-white/10 py-4 rounded-2xl active:scale-95'disabled={isLoading} onPress={()=>!isLoading && handleSocialAuth('oauth_apple')} accessibilityRole='button'accessibilityLabel='Continue with Apple'> 
         
          {loadingStrategy === 'oauth_apple' ? (<ActivityIndicator size="small" color="#FFFFFF" />) : (
           <>

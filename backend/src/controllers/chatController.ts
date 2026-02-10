@@ -48,7 +48,7 @@ export async function getOrCreateChat(req: AuthRequest, res: Response, next: Nex
             return;
         }
 
-        if (!mongoose.Types.ObjectId.isValid(participantId)){
+            if (!mongoose.Types.ObjectId.isValid(participantId as string)){
             res.status(400).json({message:"Invalid participant ID"})
             return;
         }
