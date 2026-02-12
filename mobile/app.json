@@ -1,14 +1,16 @@
 {
   "expo": {
-    "name": "GistMe",
-    "slug": "gistme",
+    "name": "mobile",
+    "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "gistme",
+    "scheme": "mobile",
     "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.mobile"
     },
     "android": {
       "adaptiveIcon": {
@@ -43,21 +45,14 @@
         "@sentry/react-native/expo",
         {
           "url": "https://sentry.io/",
-          "project": "gistme-checkout",
-          "organization": "gistme-6d"
+          "project": "whisper-app",
+          "organization": "codesistency-gs"
         }
-      ],
-      "@sentry/react-native",
-      "expo-secure-store"
+      ]
     ],
     "experiments": {
-      "typedRoutes": true
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "be45475a-c554-4e35-aabc-72b92ceefdb7"
-      }
+      "typedRoutes": true,
+      "reactCompiler": true
     }
   }
 }

@@ -1,13 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  // 1. Explicitly include all folders to ensure NativeWind scans every screen
-  content: [
-    "./app/**/*.{js,jsx,ts,tsx}",
-    "./app/(auth)/**/*.{js,jsx,ts,tsx}", 
-    "./app/(tabs)/**/*.{js,jsx,ts,tsx}",
-    "./components/**/*.{js,jsx,ts,tsx}",
-    "./src/**/*.{js,jsx,ts,tsx}", // Added in case you use a src folder later
-  ],
+  // NOTE: Update this to include the paths to all files that contain Nativewind classes.
+  content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
   theme: {
     extend: {

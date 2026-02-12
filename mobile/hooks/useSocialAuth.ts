@@ -1,45 +1,37 @@
-import {useSSO} from "@clerk/clerk-expo";
-import {useState}from "react";
-import {Alert} from "react-native";
-import { useAuthCallback } from "./useAuth";
-
-
+import { useSSO } from "@clerk/clerk-expo";
+import { useState } from "react";
+import { Alert } from "react-native";
 
 function useAuthSocial() {
-const [loadingStrategy, setLoadingStrategy] = useState<string | null>(null);
-const {startSSOFlow} = useSSO();
-const { mutateAsync: syncUser } = useAuthCallback();
+  const [loadingStrategy, setLoadingStrategy] = useState<string | null>(null);
+  const { startSSOFlow } = useSSO();
 
-const handleSocialAuth =async (starategy:'oauth_google' |'oauth_apple') => {
-   if (loadingStrategy) {
-    return;
-   }
-   setLoadingStrategy(starategy);
+  const handleSocialAuth = async (strategy: "oauth_google" | "oauth_apple") => {
+    if (loadingStrategy) return; // guard against concurrent flows
+    setLoadingStrategy(strategy);
 
+    try {
+      const { createdSessionId, setActive } = await startSSOFlow({ strategy });
+      if (!createdSessionId || !setActive) {
+        const provider = strategy === "oauth_google" ? "Google" : "Apple";
+        Alert.alert(
+          "Sign-in incomplete",
+          `${provider} sign-in did not complete. Please try again.`
+        );
+        return;
+      }
 
-   try{
-    const {createdSessionId, setActive} = await startSSOFlow({ strategy: starategy });
-
-    if (!createdSessionId || !setActive) {
-      const provider = starategy === 'oauth_google' ? 'Google' : 'Apple';
-      Alert.alert("Sign-in incomplete", `unsuccessful signed in with ${provider}`);
-      console.log(`Successfully signed in with ${provider}`);
-      return;
-      
+      await setActive({ session: createdSessionId });
+    } catch (error) {
+      console.log("💥 Error in social auth:", error);
+      const provider = strategy === "oauth_google" ? "Google" : "Apple";
+      Alert.alert("Error", `Failed to sign in with ${provider}. Please try again.`);
+    } finally {
+      setLoadingStrategy(null);
     }
-    await setActive({ session: createdSessionId });
-    await syncUser();
-   } catch (error) {
-    console.log('Social auth error:', error);
-    const provider = starategy === 'oauth_google' ? 'Google' : 'Apple';
-    Alert.alert(`Failed to sign in with ${provider}`)
-   } finally {
-    setLoadingStrategy(null);
-   }
+  };
+
+  return { handleSocialAuth, loadingStrategy };
 }
- return{
-        handleSocialAuth,
-        loadingStrategy,
-    }
-}
-export default useAuthSocial
+
+export default useAuthSocial;
