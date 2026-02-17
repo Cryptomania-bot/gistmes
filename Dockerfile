@@ -27,7 +27,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 WORKDIR /app
 # 1. Bring in the built frontend files from Stage 1
 # This keeps your final image small because it doesn't include npm or Node
-COPY --from=build-web /app/web/dist ./web/dist
+COPY --from=build-web /app/web/dist ./backend/public
 
 # 2. Setup Backend
 WORKDIR /app/backend

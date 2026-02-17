@@ -17,14 +17,23 @@ import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { useCurrentUser } from "@/hooks/useAuth";
 import { useStories } from "@/hooks/useStories";
+import { useState } from "react";
+import StoryViewer from "./StoryViewer";
 
 export default function ActiveUsersList() {
     const { data: user } = useCurrentUser();
     const { data: stories } = useStories();
+    const [viewerVisible, setViewerVisible] = useState(false);
+    const [selectedStoryIndex, setSelectedStoryIndex] = useState(0);
 
     // Group stories by user (simplified logic for now)
     const uniqueStories = stories ? Array.from(new Set(stories.map((s: any) => s.user._id)))
         .map(id => stories.find((s: any) => s.user._id === id)) : [];
+
+    const handleStoryPress = (index: number) => {
+        setSelectedStoryIndex(index);
+        setViewerVisible(true);
+    };
 
     return (
         <View className="mb-6">
@@ -50,8 +59,8 @@ export default function ActiveUsersList() {
                 </View>
 
                 {/* Active Stories */}
-                {uniqueStories.map((story: any) => (
-                    <Pressable key={story._id} className="items-center gap-1">
+                {uniqueStories.map((story: any, index: number) => (
+                    <Pressable key={story._id} className="items-center gap-1" onPress={() => handleStoryPress(index)}>
                         <View className="relative">
                             <View className="w-16 h-16 rounded-full border-2 border-blue-500 items-center justify-center p-0.5">
                                 <Image
@@ -64,6 +73,13 @@ export default function ActiveUsersList() {
                     </Pressable>
                 ))}
             </ScrollView>
+
+            <StoryViewer
+                visible={viewerVisible}
+                stories={uniqueStories}
+                initialStoryIndex={selectedStoryIndex}
+                onClose={() => setViewerVisible(false)}
+            />
         </View>
     );
 }
