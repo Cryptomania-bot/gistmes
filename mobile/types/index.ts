@@ -30,8 +30,21 @@ export interface ChatLastMessage {
 
 export interface Chat {
   _id: string;
-  participant: MessageSender;
+  participant: MessageSender; // For 1-on-1, formatted by backend or frontend
+  participants?: MessageSender[]; // For groups
   lastMessage: ChatLastMessage | null;
   lastMessageAt: string;
   createdAt: string;
+
+  // Group specific
+  isGroup?: boolean;
+  name?: string;
+  groupImage?: string;
+  description?: string;
+  admin?: string; // ID of admin
+  settings?: {
+    onlyAdminsCanPost: boolean;
+    onlyAdminsCanEditInfo: boolean;
+  };
+  inviteCode?: string;
 }

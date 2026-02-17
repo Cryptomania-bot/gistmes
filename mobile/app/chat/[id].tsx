@@ -29,7 +29,7 @@ type ChatParams = {
 };
 
 const ChatDetailScreen = () => {
-  const { id: chatId, avatar, name, participantId } = useLocalSearchParams<ChatParams>();
+  const { id: chatId, avatar, name, participantId, isGroup } = useLocalSearchParams<ChatParams & { isGroup?: string }>();
 
   const [messageText, setMessageText] = useState("");
   const [isSending, setIsSending] = useState(false);

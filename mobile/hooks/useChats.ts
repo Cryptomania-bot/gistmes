@@ -35,3 +35,36 @@ export const useGetOrCreateChat = () => {
     },
   });
 };
+
+export const useCreateGroup = () => {
+  const { apiWithAuth } = useApi();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (groupData: { name: string; description?: string; groupImage?: string }) => {
+      const { data } = await apiWithAuth<Chat>({
+        method: "POST",
+        url: "/groups",
+        data: groupData
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chats"] });
+    },
+  });
+};
+
+export const useChat = (chatId: string) => {
+  const { apiWithAuth } = useApi();
+  const { isSignedIn } = useAuth();
+
+  return useQuery({
+    queryKey: ["chat", chatId],
+    queryFn: async () => {
+      const { data } = await apiWithAuth<Chat>({ method: "GET", url: `/chats/${chatId}` });
+      return data;
+    },
+    enabled: !!chatId && isSignedIn,
+  });
+};

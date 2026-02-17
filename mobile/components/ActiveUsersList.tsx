@@ -2,6 +2,10 @@ import { View, Text, ScrollView, Pressable } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { useCurrentUser } from "@/hooks/useAuth";
+import { useStories } from "@/hooks/useStories";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import StoryViewer from "./StoryViewer";
 
 // Mock data for initial implementation
 const MOCK_ACTIVE_USERS = [
@@ -12,19 +16,12 @@ const MOCK_ACTIVE_USERS = [
     { id: "5", name: "Team", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&h=100&fit=crop" },
 ];
 
-import { View, Text, ScrollView, Pressable } from "react-native";
-import { Image } from "expo-image";
-import { Ionicons } from "@expo/vector-icons";
-import { useCurrentUser } from "@/hooks/useAuth";
-import { useStories } from "@/hooks/useStories";
-import { useState } from "react";
-import StoryViewer from "./StoryViewer";
-
 export default function ActiveUsersList() {
     const { data: user } = useCurrentUser();
     const { data: stories } = useStories();
     const [viewerVisible, setViewerVisible] = useState(false);
     const [selectedStoryIndex, setSelectedStoryIndex] = useState(0);
+    const router = useRouter();
 
     // Group stories by user (simplified logic for now)
     const uniqueStories = stories ? Array.from(new Set(stories.map((s: any) => s.user._id)))
@@ -43,7 +40,7 @@ export default function ActiveUsersList() {
                 contentContainerStyle={{ paddingHorizontal: 20, gap: 16 }}
             >
                 {/* Add Story Button */}
-                <View className="items-center gap-1">
+                <Pressable className="items-center gap-1" onPress={() => router.push("/story/new")}>
                     <View className="relative">
                         <View className="w-16 h-16 rounded-full border-2 border-dashed border-primary/50 items-center justify-center">
                             <Image
@@ -56,7 +53,7 @@ export default function ActiveUsersList() {
                         </View>
                     </View>
                     <Text className="text-xs text-subtle-foreground">My Story</Text>
-                </View>
+                </Pressable>
 
                 {/* Active Stories */}
                 {uniqueStories.map((story: any, index: number) => (

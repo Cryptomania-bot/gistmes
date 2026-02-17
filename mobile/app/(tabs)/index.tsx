@@ -106,12 +106,20 @@ function Header() {
           <Text className="text-3xl font-bold text-foreground font-mono">Chats</Text>
         </View>
 
-        <Pressable
-          className="w-12 h-12 bg-primary rounded-full items-center justify-center shadow-lg shadow-orange-500/20"
-          onPress={() => router.push("/new-chat")}
-        >
-          <Ionicons name="add" size={24} color="#0D0D0F" />
-        </Pressable>
+        <View className="flex-row gap-3">
+          <Pressable
+            className="w-12 h-12 bg-surface-light rounded-full items-center justify-center"
+            onPress={() => router.push("/new-group")}
+          >
+            <Ionicons name="people" size={24} color="#F4F4F5" />
+          </Pressable>
+          <Pressable
+            className="w-12 h-12 bg-primary rounded-full items-center justify-center shadow-lg shadow-orange-500/20"
+            onPress={() => router.push("/new-chat")}
+          >
+            <Ionicons name="add" size={24} color="#0D0D0F" />
+          </Pressable>
+        </View>
       </View>
 
       {/* Active Users List */}
