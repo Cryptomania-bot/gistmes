@@ -12,8 +12,19 @@ const MOCK_ACTIVE_USERS = [
     { id: "5", name: "Team", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&h=100&fit=crop" },
 ];
 
+import { View, Text, ScrollView, Pressable } from "react-native";
+import { Image } from "expo-image";
+import { Ionicons } from "@expo/vector-icons";
+import { useCurrentUser } from "@/hooks/useAuth";
+import { useStories } from "@/hooks/useStories";
+
 export default function ActiveUsersList() {
     const { data: user } = useCurrentUser();
+    const { data: stories } = useStories();
+
+    // Group stories by user (simplified logic for now)
+    const uniqueStories = stories ? Array.from(new Set(stories.map((s: any) => s.user._id)))
+        .map(id => stories.find((s: any) => s.user._id === id)) : [];
 
     return (
         <View className="mb-6">
@@ -38,20 +49,18 @@ export default function ActiveUsersList() {
                     <Text className="text-xs text-subtle-foreground">My Story</Text>
                 </View>
 
-                {/* Active Users */}
-                {MOCK_ACTIVE_USERS.map((activeUser) => (
-                    <Pressable key={activeUser.id} className="items-center gap-1">
+                {/* Active Stories */}
+                {uniqueStories.map((story: any) => (
+                    <Pressable key={story._id} className="items-center gap-1">
                         <View className="relative">
-                            <View className="w-16 h-16 rounded-full border-2 border-primary items-center justify-center p-0.5">
+                            <View className="w-16 h-16 rounded-full border-2 border-blue-500 items-center justify-center p-0.5">
                                 <Image
-                                    source={activeUser.avatar}
+                                    source={story.user.avatar}
                                     style={{ width: "100%", height: "100%", borderRadius: 999 }}
                                 />
                             </View>
-                            {/* Online Dot */}
-                            <View className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-surface" />
                         </View>
-                        <Text className="text-xs text-foreground font-medium">{activeUser.name}</Text>
+                        <Text className="text-xs text-foreground font-medium">{story.user.name}</Text>
                     </Pressable>
                 ))}
             </ScrollView>

@@ -22,11 +22,18 @@ app.get('/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is healthy' });
 });
 
+import groupRoutes from './routes/groupRoutes.js';
+import quizRoutes from './routes/quizRoutes.js';
+import socialRoutes from './routes/socialRoutes.js';
+
 // --- API Routes ---
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/groups', groupRoutes);
+app.use('/api/quizzes', quizRoutes);
+app.use('/api/social', socialRoutes);
 
 // Error Handler (Keep this AFTER your API routes)
 app.use(errorHandler);

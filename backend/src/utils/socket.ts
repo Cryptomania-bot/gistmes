@@ -83,15 +83,21 @@ export const initializeSocket = (httpServer: HttpServer) => {
                     participants: userId
                 })
 
-                if(!chat){
-                    socket.emit("socket-error", {message:"Chat not found"});
+                if (!chat) {
+                    socket.emit("socket-error", { message: "Chat not found" });
                     return;
+                }
 
+                if (chat.isGroup && chat.settings?.onlyAdminsCanPost) {
+                    if (chat.admin?.toString() !== userId) {
+                        socket.emit("socket-error", { message: "Only admins can post in this group" });
+                        return;
+                    }
                 }
 
                 const message = await Message.create({
-                    chat:chatId,
-                    sender:userId,
+                    chat: chatId,
+                    sender: userId,
                     text,
                 });
 
@@ -99,7 +105,7 @@ export const initializeSocket = (httpServer: HttpServer) => {
                 chat.lastMessageAt = new Date()
                 await chat.save()
 
-                await message.populate("sender","name avatar")
+                await message.populate("sender", "name avatar")
 
                 io.to(`chat:${chatId}`).emit("new-messages", message)
 
@@ -113,8 +119,31 @@ export const initializeSocket = (httpServer: HttpServer) => {
         });
 
         //TODO:LATER
-        socket.on("typing", async(data)=>{});
+        socket.on("typing", async (data) => { });
 
+
+
+        // WebRTC Signaling
+        socket.on("call-offer", (data: { callerId: string, receiverId: string, offer: any }) => {
+            io.to(`user:${data.receiverId}`).emit("call-offer", {
+                callerId: userId,
+                offer: data.offer
+            });
+        });
+
+        socket.on("call-answer", (data: { callerId: string, answer: any }) => {
+            io.to(`user:${data.callerId}`).emit("call-answer", {
+                receiverId: userId,
+                answer: data.answer
+            });
+        });
+
+        socket.on("ice-candidate", (data: { targetId: string, candidate: any }) => {
+            io.to(`user:${data.targetId}`).emit("ice-candidate", {
+                senderId: userId,
+                candidate: data.candidate
+            });
+        });
 
 
         socket.on("disconnect", () => {
